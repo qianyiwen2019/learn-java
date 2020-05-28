@@ -40,7 +40,7 @@ public class TestClassLoader extends ClassLoader {
             // 而当前 classLoader 的 parent 的 parent 才是 ExtClassLoader
             return getParent().getParent().loadClass(name);
         } catch (Exception e) {
-            System.out.println("class " + name + " is not laoded by parent");
+            System.out.println("class " + name + " is not loaded by parent");
         }
 
         byte[] b = null;

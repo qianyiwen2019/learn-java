@@ -1,17 +1,20 @@
 package classLoaderDemo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializeConfig;
+
 /**
  * @author shicai.xsc 2019/8/4 下午3:50
  * @desc
  * @since 5.0.0.0
  */
 public class App {
-    private String path = "/Users/shicai.xsc/Documents/Work/jingwei-tool/hsfdemo/target/classes";
+    private String path = System.getProperty("user.dir") + "/target/classes";
     private String className = "classLoaderDemo.Robot";
 
     public static void main(String[] args) throws Exception {
         App app = new App();
-        app.errorLoad2();
+        app.errorLoad3();
     }
 
     public void errorLoad1() throws Exception {
@@ -38,23 +41,44 @@ public class App {
     public void errorLoad2() throws Exception {
         // 默认为 Launcher$AppClassLoader 加载
         // sun.misc.Launcher$AppClassLoader@18b4aac2
-        System.out.println(new Robot().getClass().getClassLoader());
+        System.out.println("111111: Robot:" + new Robot().getClass().getClassLoader());
 
         TestClassLoader loader = new TestClassLoader(path);
         Class clazz = loader.loadClass(className);
 
         // classLoaderDemo.TestClassLoader@1761e840
-        System.out.println(clazz.getClassLoader());
+        System.out.println("2222222:" + clazz.getClassLoader());
 
         // classLoaderDemo.TestClassLoader@6c629d6e
-        System.out.println(clazz.newInstance().getClass().getClassLoader());
+        System.out.println("3333333: Robot:" + clazz.newInstance().getClass().getClassLoader());
 
         // 设置当前进程的 ClassLoader
         Thread.currentThread().setContextClassLoader(loader);
         // sun.misc.Launcher$AppClassLoader@18b4aac2
-        System.out.println(new Robot().getClass().getClassLoader());
+        System.out.println("44444: Robot:" + new Robot().getClass().getClassLoader());
 
         Robot a = (Robot)clazz.newInstance();
+    }
+
+    public void errorLoad3() throws Exception {
+        TestClassLoader loader = new TestClassLoader(path);
+        Thread.currentThread().setContextClassLoader(loader);
+
+        Class clazz = loader.loadClass(className);
+
+        // classLoaderDemo.TestClassLoader@1761e840
+        System.out.println("2222222:" + clazz.getClassLoader());
+
+        // classLoaderDemo.TestClassLoader@6c629d6e
+        System.out.println("3333333: Robot:" + clazz.newInstance().getClass().getClassLoader());
+
+        Robot robot = new Robot();
+        System.out.println("4444444: Robot:" + robot.getClass().getClassLoader());
+
+        System.out.println("JSON classloader: " + JSON.class.getClassLoader());
+        System.out.println("SerializeConfig classloader: " + SerializeConfig.globalInstance.getClass().getClassLoader());
+        JSON.toJSONString(clazz.newInstance());
+        JSON.toJSONString(robot);
     }
 
     public void errorLoad0() throws Exception {
